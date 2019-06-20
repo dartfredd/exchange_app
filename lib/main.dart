@@ -28,11 +28,55 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  @override
-  Widget build(BuildContext context) {
+
     double euro;
     double dolar;
-    double bitcoin;
+    double bitcoinValue;
+
+    final realController = TextEditingController();
+    final euroController = TextEditingController();
+    final dolarController = TextEditingController();
+
+    void _clearAll(){
+        realController.text = "";
+        dolarController.text = "";
+        euroController.text = "";
+      }
+
+    void _realChanged(String text){
+      if(text.isEmpty){
+        this._clearAll();
+        return;
+      }
+      double real  = double.parse(text);
+      dolarController.text = (real/dolar).toStringAsFixed(2);
+      euroController.text = (real/euro).toStringAsFixed(2);
+      
+    }
+    void _dolarChanged(String text){
+      if(text.isEmpty){
+        this._clearAll();
+        return;
+      }
+      double dolar = double.parse(text);
+      realController.text = (dolar * this.dolar).toStringAsFixed(2);
+      euroController.text = (dolar * this.dolar/euro).toStringAsFixed(2);
+      
+    }
+    void _euroChanged(String text){
+      if(text.isEmpty){
+        this._clearAll();
+        return;
+      }
+      double euro = double.parse(text);
+      realController.text = (euro * this.euro).toStringAsFixed(2);
+      dolarController.text = (euro * this.euro/dolar).toStringAsFixed(2);
+      
+    }
+
+
+  @override
+  Widget build(BuildContext context) { 
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.amber,
@@ -67,8 +111,7 @@ class _HomeState extends State<Home> {
                           textAlign: TextAlign.center),
                     );
                   } else {
-                    dolar =
-                        snapshot.data["results"]["currencies"]["USD"]["buy"];
+                    dolar = snapshot.data["results"]["currencies"]["USD"]["buy"];
                     euro = snapshot.data["results"]["currencies"]["EUR"]["buy"];
                     return SingleChildScrollView(
                       padding: EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
@@ -80,11 +123,11 @@ class _HomeState extends State<Home> {
                             child: Icon(Icons.monetization_on,
                                 size: 100.0, color: Colors.amber),
                           ),
-                          currencyTextField("Real", "R\$"),
+                          currencyTextField("Real", "R\$" , realController , _realChanged ),
                           Divider(),
-                          currencyTextField("Dólar", "US\$"),
+                          currencyTextField("Dólar", "US\$" , dolarController , _dolarChanged),
                           Divider(),
-                          currencyTextField("Euro", "€")
+                          currencyTextField("Euro", "€" , euroController , _euroChanged)
                         ],
                       ),
                     );
@@ -94,8 +137,9 @@ class _HomeState extends State<Home> {
   }
 }
 
-Widget currencyTextField(String label, String symbol) {
+Widget currencyTextField(String label, String symbol , TextEditingController controller , Function change) {
   return TextField(
+    controller: controller,
     decoration: InputDecoration(
       labelText: label,
       labelStyle: TextStyle(color: Colors.amber, fontSize: 25.0),
@@ -104,5 +148,7 @@ Widget currencyTextField(String label, String symbol) {
       prefixStyle: TextStyle(color: Colors.amber, fontSize: 25.0),
     ),
     style: TextStyle(color: Colors.amber, fontSize: 25.0),
+    onChanged: change,
+    keyboardType: TextInputType.numberWithOptions(decimal: true),
   );
 }
