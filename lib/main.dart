@@ -152,3 +152,4 @@ Widget currencyTextField(String label, String symbol , TextEditingController con
     keyboardType: TextInputType.numberWithOptions(decimal: true),
   );
 }
+
